@@ -1,36 +1,51 @@
 #include <iostream>
 #include <windows.h>
+#include <stdio.h>
+#include <stdlib.h> 
+#include <time.h>   
 
-//01_02
-int Recursive(int n) {
-    //1時間目は100円
-    if (n <= 1) {
-        return 100;
+typedef void (*PFunc)(int, int);
+
+// コールバック関数
+void JudgeResult(int dice, int userGuess) {
+    // 出目が奇数(1)か偶数(2)かを判定
+    int result = (dice % 2 != 0) ? 1 : 2;
+
+    printf("\n出目: %d (%s)\n", dice, (result == 1) ? "半 / 奇数" : "丁 / 偶数");
+
+    if (userGuess == result) {
+        printf("正解\n");
     }
-    // 再帰
-    return Recursive(n - 1) * 2 - 50;
+    else {
+        printf("不正解\n");
+    }
+}
+
+// タイムアウト処理
+void SetTimeOut(PFunc p, int second, int dice, int userGuess) {
+    printf("%d秒待機中...\n", second);
+    fflush(stdout);
+    Sleep(second * 1000);
+    p(dice, userGuess);
 }
 
 int main() {
+    srand((unsigned int)time(NULL));
 
-    SetConsoleOutputCP(65001);
+    printf("丁半ゲーム！[1:半(奇数) / 2:丁(偶数)] 入力してください: ");
 
-    int fixed_rate = 1072;     // 一般的な時給
-    int recursive_total = 0; // 再帰の累積額
-    int fixed_total = 0;     // 一般の累積額
+    int userGuess;
+    scanf_s("%d", &userGuess);
 
-    printf("時間 | 再帰時給 | 再帰累計 | 一般累計\n");
-    printf("\n--------------------------------------\n");
-
-    for (int h = 1; h <= 10; h++) {
-        int hourly_wage = Recursive(h);
-        recursive_total += hourly_wage;
-        fixed_total += fixed_rate;
-
-        printf("\n%2dh | %8d\ | %8lld\ | %8lld\ \n", h, hourly_wage, recursive_total, fixed_total);
-
-
+    if (userGuess != 1 && userGuess != 2) {
+        printf("1か2を入れてください。\n");
+        return 1;
     }
+
+    int dice = (rand() % 6) + 1;
+
+    PFunc p = JudgeResult;
+    SetTimeOut(p, 3, dice, userGuess);
 
     return 0;
 }
