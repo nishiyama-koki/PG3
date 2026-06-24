@@ -1,50 +1,72 @@
+#define NOMINMAX
 #include <iostream>
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <time.h>   
 #include <functional>
+#include <limits> // std::numeric_limits を使うために追加
 
-using PFunc = std::function<void(int)>;
+using namespace std;
 
-//01_04
+class Enemy {
+public:
+    void Update();
 
-void SetTimeOut(PFunc p, int second, int dice) {
-    printf("%d秒待機中...\n", second);
-    fflush(stdout);
-    Sleep(second * 1000);
-    p(dice);
+    void Attack();
+    void Escape();
+    void Approach();
+    static void (Enemy::* table[])();
+    int index = 0;
+};
+
+void Enemy::Attack() {
+    printf("敵は攻撃してきた！\n");
 }
 
-int main() {
-    srand((unsigned int)time(NULL));
+void Enemy::Escape() {
+    printf("敵は逃げ出した！\n");
+}
 
-    printf("丁半ゲーム[1:半(奇数) / 2:丁(偶数)] 入力してください: ");
+void Enemy::Approach() {
+    printf("敵は近づいてきた！\n");
+}
 
-    int userGuess;
-    scanf_s("%d", &userGuess);
+void Enemy::Update() {
+    // 関数テーブルから関数を実行
+    (this->*table[index])();
 
-    if (userGuess != 1 && userGuess != 2) {
-        printf("1か2を入れてください。\n");
-        return 1;
+    cout << ": ";
+    int input;
+    cin >> input;
+
+    if (cin.fail()) {
+        cin.clear(); 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+        input = -1; 
     }
 
-    int dice = (rand() % 6) + 1;
+    if (input == 0) {
+        index = (index + 1) % 3;
+    }
+}
 
-    PFunc p = [userGuess](int d) {
-        int result = (d % 2 != 0) ? 1 : 2;
+// メンバ関数ポインタテーブル
+void (Enemy::* Enemy::table[])() = {
+    &Enemy::Approach,
+    &Enemy::Escape,
+    &Enemy::Attack,
+};
 
-        printf("\n出目: %d (%s)\n", d, (result == 1) ? "半 / 奇数" : "丁 / 偶数");
+int main()
+{
 
-        if (userGuess == result) {
-            printf("正解\n");
-        }
-        else {
-            printf("不正解\n");
-        }
-        };
+    Enemy enemy;
 
-    SetTimeOut(p, 3, dice);
+    while (1)
+    {
+        enemy.Update();
+    }
 
     return 0;
 }
