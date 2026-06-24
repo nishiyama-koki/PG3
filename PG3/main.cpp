@@ -5,7 +5,7 @@
 #include <stdlib.h> 
 #include <time.h>   
 #include <functional>
-#include <limits> // std::numeric_limits を使うために追加
+#include <limits> 
 
 using namespace std;
 
@@ -54,8 +54,8 @@ void Enemy::Update() {
 // メンバ関数ポインタテーブル
 void (Enemy::* Enemy::table[])() = {
     &Enemy::Approach,
-    &Enemy::Escape,
     &Enemy::Attack,
+    &Enemy::Escape,
 };
 
 int main()
