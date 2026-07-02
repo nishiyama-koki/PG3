@@ -9,43 +9,37 @@
 
 using namespace std;
 
-template <typename Type1, typename Type2>
-class ClassTemplate
-{
+class Animal {
 public:
+	virtual void speak()=0;
+protected:
+	const char* name;
+};
 
-	Type1 num1;
-	Type2 num2;
+class Dog : public Animal {
+public:
+	void speak() override {
+		printf("犬:わん\n");
+	};
+};
 
-	ClassTemplate(Type1 n1, Type2 n2) : num1(n1), num2(n2) {}
-
-	Type1 min() {
-		if (num1 < num2) {
-			return num1;
-		}
-		else {
-			return num2;
-		}
-	}
-
+class Cat : public Animal {
+public:
+	void speak() override {
+		printf("猫:にゃー\n");
+	};
 };
 
 int main()
 {
-	ClassTemplate<int, int> intInt(10, 20);
-	ClassTemplate<int, float> intFloat(10, 5.5f);
-	ClassTemplate<int, double> intDouble(10, 3.14);
-	ClassTemplate<float, float> floatFloat(10.5f, 20.5f);
-	ClassTemplate<float, double> floatDouble(10.5f, 4.25);
-	ClassTemplate<double, double> doubleDouble(10.0, 20.5);
-	
-	cout << intInt.min() << endl;
-	cout << intFloat.min() << endl;
-	cout << intDouble.min() << endl;
-	cout << floatFloat.min() << endl;
-	cout << floatDouble.min() << endl;
-	cout << doubleDouble.min() << endl;
+	Animal* animal1 = new Dog();
+	Animal* animal2 = new Cat();
 
+	animal1->speak();
+	animal2->speak();
+
+	delete animal1;
+	delete animal2;
 
 	return 0;
 }
