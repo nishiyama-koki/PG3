@@ -1,70 +1,63 @@
 #define NOMINMAX
 #include <iostream>
-//#include <windows.h>
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <time.h>   
 #include <functional>
 #include <limits> 
+#include <list> 
 
 
-class IShape {
-protected:
-    double area; 
+using namespace std;
 
-public:
-    virtual ~IShape() {} 
-    virtual void Size() = 0;
-    virtual void Draw() = 0;
-};
+void PrintStationList(const list<const char*>& stationList, int year)
+{
+	printf("===== %d =====\n", year);
+	for (const char* station : stationList)
+	{
+		printf("%s\n", station);
+	}
+	printf("\n");
+}
 
-class Circle : public IShape {
-private:
-    double radius;
+int main()
+{
+	SetConsoleOutputCP(65001);
 
-public:
-    Circle(double r = 4.0) : radius(r) {}
-    void Size() override {
-        area = radius * radius * 3.14;
-    }
-    void Draw() override {
-        printf("円の面積: %.2f\n", area);
-    }
-};
+	list<const char*> yamanote = {
+		"Tokyo", "Kanda", "Akihabara", "Okachimachi", "Ueno", "Uguisudani",
+		"Nippori", "Tabata", "Komagome", "Sugamo", "Otsuka", "Ikebukuro",
+		"Mejiro", "Takadanobaba", "Shin-Okubo", "Shinjuku", "Yoyogi", "Harajuku",
+		"Shibuya", "Ebisu", "Meguro", "Gotanda", "Osaki", "Shinagawa",
+		"Tamachi", "Hamamatsucho", "Shimbashi", "Yurakucho"
+	};
 
-class Rectangle : public IShape {
-private:
-    double width;
-    double height;
+	PrintStationList(yamanote, 1970);
 
-public:
-    Rectangle(double w = 2.0, double h = 3.0) : width(w), height(h) {}
-    void Size() override {
-        area = width * height;
-    }
-    void Draw() override {
-        printf("矩形の面積: %.2f\n", area);
-    }
-};
+	for (auto it = yamanote.begin(); it != yamanote.end(); ++it)
+	{
 
+		if (*it == "Tabata")
+		{
+			yamanote.insert(it, "Nishi-Nippori");
+			break;
+		}
+	}
 
-int main(void) {
+	PrintStationList(yamanote, 2019);
 
-    IShape* shape[2];
+	for (auto it = yamanote.begin(); it != yamanote.end(); ++it)
+	{
+		if (strcmp(*it, "Tamachi") == 0)
+		{
+			yamanote.insert(it, "Takanawa Gateway");
+			break;
+		}
+	}
 
-    shape[0] = new Circle();
-    shape[1] = new Rectangle();
+	// 2022年時点のリストを表示
+	PrintStationList(yamanote, 2022);
 
-    printf("円の半径:4\n矩形の底辺:2\n矩形の高さ:3\n\n");
-    for (int i = 0; i < 2; i++)
-        shape[i]->Size();
-
-    printf("\n");
-    for (int i = 0; i < 2; i++)
-        shape[i]->Draw();
-
-    for (int i = 0; i < 2; i++)
-        delete shape[i];
-
-    return 0;
+	return 0;
 }
