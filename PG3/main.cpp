@@ -1,45 +1,70 @@
 #define NOMINMAX
 #include <iostream>
-#include <windows.h>
+//#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h> 
 #include <time.h>   
 #include <functional>
 #include <limits> 
 
-using namespace std;
 
-class Animal {
-public:
-	virtual void speak()=0;
+class IShape {
 protected:
-	const char* name;
-};
+    double area; 
 
-class Dog : public Animal {
 public:
-	void speak() override {
-		printf("犬:わん\n");
-	};
+    virtual ~IShape() {} 
+    virtual void Size() = 0;
+    virtual void Draw() = 0;
 };
 
-class Cat : public Animal {
+class Circle : public IShape {
+private:
+    double radius;
+
 public:
-	void speak() override {
-		printf("猫:にゃー\n");
-	};
+    Circle(double r = 4.0) : radius(r) {}
+    void Size() override {
+        area = radius * radius * 3.14;
+    }
+    void Draw() override {
+        printf("円の面積: %.2f\n", area);
+    }
 };
 
-int main()
-{
-	Animal* animal1 = new Dog();
-	Animal* animal2 = new Cat();
+class Rectangle : public IShape {
+private:
+    double width;
+    double height;
 
-	animal1->speak();
-	animal2->speak();
+public:
+    Rectangle(double w = 2.0, double h = 3.0) : width(w), height(h) {}
+    void Size() override {
+        area = width * height;
+    }
+    void Draw() override {
+        printf("矩形の面積: %.2f\n", area);
+    }
+};
 
-	delete animal1;
-	delete animal2;
 
-	return 0;
+int main(void) {
+
+    IShape* shape[2];
+
+    shape[0] = new Circle();
+    shape[1] = new Rectangle();
+
+    printf("円の半径:4\n矩形の底辺:2\n矩形の高さ:3\n\n");
+    for (int i = 0; i < 2; i++)
+        shape[i]->Size();
+
+    printf("\n");
+    for (int i = 0; i < 2; i++)
+        shape[i]->Draw();
+
+    for (int i = 0; i < 2; i++)
+        delete shape[i];
+
+    return 0;
 }
