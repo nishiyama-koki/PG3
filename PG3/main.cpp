@@ -7,57 +7,32 @@
 #include <functional>
 #include <limits> 
 #include <list> 
-
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 using namespace std;
+std::mutex mtx;
+std::condition_variable cnd;
+int turn = 1; 
+int main() {
 
-void PrintStationList(const list<const char*>& stationList, int year)
-{
-	printf("===== %d =====\n", year);
-	for (const char* station : stationList)
-	{
-		printf("%s\n", station);
-	}
-	printf("\n");
-}
+    auto printThread = [](int id) {
+        
+        std::unique_lock<std::mutex> lock(mtx);
+        cnd.wait(lock, [id] { return turn == id; });
+        printf("thread %d\n", id);
+        turn++;
+        cnd.notify_all();
+        };
 
-int main()
-{
-	SetConsoleOutputCP(65001);
+    std::thread th1(printThread, 1);
+    std::thread th2(printThread, 2);
+    std::thread th3(printThread, 3);
 
-	list<const char*> yamanote = {
-		"Tokyo", "Kanda", "Akihabara", "Okachimachi", "Ueno", "Uguisudani",
-		"Nippori", "Tabata", "Komagome", "Sugamo", "Otsuka", "Ikebukuro",
-		"Mejiro", "Takadanobaba", "Shin-Okubo", "Shinjuku", "Yoyogi", "Harajuku",
-		"Shibuya", "Ebisu", "Meguro", "Gotanda", "Osaki", "Shinagawa",
-		"Tamachi", "Hamamatsucho", "Shimbashi", "Yurakucho"
-	};
+    th1.join();
+    th2.join();
+    th3.join();
 
-	PrintStationList(yamanote, 1970);
-
-	for (auto it = yamanote.begin(); it != yamanote.end(); ++it)
-	{
-
-		if (*it == "Tabata")
-		{
-			yamanote.insert(it, "Nishi-Nippori");
-			break;
-		}
-	}
-
-	PrintStationList(yamanote, 2019);
-
-	for (auto it = yamanote.begin(); it != yamanote.end(); ++it)
-	{
-		if (strcmp(*it, "Tamachi") == 0)
-		{
-			yamanote.insert(it, "Takanawa Gateway");
-			break;
-		}
-	}
-
-	// 2022年時点のリストを表示
-	PrintStationList(yamanote, 2022);
-
-	return 0;
+    return 0;
 }
