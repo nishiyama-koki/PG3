@@ -10,29 +10,29 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 using namespace std;
-std::mutex mtx;
-std::condition_variable cnd;
-int turn = 1; 
 int main() {
+    // 100万文字の 'a' で初期化
+    std::string a(1000000, 'a');
+    auto start_copy = std::chrono::high_resolution_clock::now();
 
-    auto printThread = [](int id) {
-        
-        std::unique_lock<std::mutex> lock(mtx);
-        cnd.wait(lock, [id] { return turn == id; });
-        printf("thread %d\n", id);
-        turn++;
-        cnd.notify_all();
-        };
+    std::string copy_a = a; 
 
-    std::thread th1(printThread, 1);
-    std::thread th2(printThread, 2);
-    std::thread th3(printThread, 3);
+    auto end_copy = std::chrono::high_resolution_clock::now();
+    auto duration_copy = std::chrono::duration_cast<std::chrono::microseconds>(end_copy - start_copy).count();
 
-    th1.join();
-    th2.join();
-    th3.join();
+    // 2移動（ムーブ）にかかる時間の計測
+    auto start_move = std::chrono::high_resolution_clock::now();
+
+    std::string move_a = std::move(a); 
+
+    auto end_move = std::chrono::high_resolution_clock::now();
+    auto duration_move = std::chrono::duration_cast<std::chrono::microseconds>(end_move - start_move).count();
+    // 結果表示
+    std::cout << "Copy time: " << duration_copy << " us" << std::endl;
+    std::cout << "Move time: " << duration_move << " us" << std::endl;
 
     return 0;
 }
